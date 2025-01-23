@@ -98,10 +98,6 @@ body {
   filter: drop-shadow(3px 3px 7px);
 }
 
-/* .moon:hover {
-  transform: scale(1.1);
-} */
-
 .floor {
   position: absolute;
   z-index: 2;
@@ -117,10 +113,12 @@ body {
   bottom: 5%;
   /* left: 40%; */
   z-index: 9;
+  transition: all .3s ease;
 }
 
 .role img {
   width: min(20vw, 300px);
+  /* width: 300px; */
 }
 
 @media (max-width:900px) {
