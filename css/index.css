@@ -72,7 +72,7 @@ body {
 
 .moon {
   position: absolute;
-  top: 20%;
+  top: 18vh;
   z-index: 1;
   transition: all .3s ease;
   cursor: pointer;
@@ -99,7 +99,8 @@ body {
   bottom: 5%;
   left: 40%;
   z-index: 9;
-  transition: all .3s ease;
+  filter: drop-shadow(0 0 3px rgb(0, 0, 0));
+  transition: all .5s ease-in-out;
 }
 
 .role img {
@@ -123,6 +124,7 @@ body {
   font-size: min(5vw, 3rem);
   opacity: 1;
   transition: all .3s ease;
+  pointer-events: none;
 }
 
 .loading .square {
@@ -173,6 +175,37 @@ body {
 
 .loading .animation:nth-child(10) {
   animation: updown .5s 4.5s ease;
+}
+
+.click {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 3000;
+  width: 30px;
+  aspect-ratio: 1;
+  background: url('../images/click.png') no-repeat center center / cover;
+  filter: drop-shadow(0 0 3px rgb(255, 255, 255));
+  opacity: 0;
+}
+
+.click-animation {
+  opacity: 0;
+  animation: click 0.5s ease-out;
+}
+
+@keyframes click {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }
 
 @keyframes updown {
