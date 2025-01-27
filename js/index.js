@@ -38,26 +38,46 @@ shade.addEventListener('click', function (e) {
   e.stopPropagation();
 });
 
-// 角色点击移动
+// 公共属性
 const screen = document.documentElement;
 const role = document.querySelector('.role');
+
+const rotateYValue = role.style.transform;
+const matchRotateYValue = rotateYValue.match(/rotateY\(([^)]+)\)/);
+
+const translateZValue = role.style.transform;
+const matchTranslateZValue = translateZValue.match(/translateZ\(([^)]+)\)/);
+
+const floorHeight = Math.max(innerHeight * 0.16216 - 1, 85);
+
+let flag = true;
+
+
+// 角色点击移动
 const click = document.querySelector('.click');
 // 换算角色位置并初始化
 role.style.left = `${parseInt(role.style.left) * 0.01 * screen.clientWidth}px`;
 
-let flag = true;
-
 screen.addEventListener('click', function (e) {
   const clickDistance = e.clientX - role.clientWidth / 2;
+  const z = Math.max(screen.clientHeight - e.clientY, 0);
 
   if (clickDistance > parseFloat(role.style.left)) {
-    role.style.transform = 'rotateY(180deg)';
+    if (z < floorHeight) {
+      role.style.transform = `translateZ(${-z * 1.11}px) rotateY(180deg)`;
+    } else {
+      role.style.transform = `translateZ(-150px) rotateY(180deg)`;
+    }
     setTimeout(function () {
       role.style.left = `${clickDistance}px`;
     }, flag ? 500 : 0);
     flag = false;
   } else {
-    role.style.transform = 'rotateY(0deg)';
+    if (z < floorHeight) {
+      role.style.transform = `translateZ(${-z * 1.11}px) rotateY(0deg)`;
+    } else {
+      role.style.transform = `translateZ(-150px) rotateY(0deg)`;
+    }
     setTimeout(function () {
       role.style.left = `${clickDistance}px`;
     }, flag ? 0 : 500);
@@ -78,26 +98,45 @@ screen.addEventListener('click', function (e) {
 screen.addEventListener('keydown', function (e) {
   const roleRect = role.getBoundingClientRect();
   const x = roleRect.left;
-  const moveDistance = 100;
+  const z = Math.max(innerHeight - roleRect.bottom, 0);
+  const moveDistanceX = 100;
+  const moveDistanceZ = 30;
+  const translateZValue = role.style.transform;
+  const matchTranslateZValue = translateZValue.match(/translateZ\(([^)]+)\)/);
+  let deg = matchRotateYValue[1];
+  let px = matchTranslateZValue[1];
+
 
   function turnRight() {
-    if (parseInt(role.style.left) < screen.clientWidth - role.clientWidth - moveDistance) {
-      role.style.left = `${x + moveDistance}px`;
+    if (parseInt(role.style.left) < screen.clientWidth - role.clientWidth - moveDistanceX) {
+      role.style.left = `${x + moveDistanceX}px`;
     } else {
       role.style.left = `${screen.clientWidth - role.clientWidth}px`;
     }
   }
 
   function turnLeft() {
-    if (parseInt(role.style.left) > moveDistance) {
-      role.style.left = `${x - moveDistance}px`;
+    if (parseInt(role.style.left) > moveDistanceX) {
+      role.style.left = `${x - moveDistanceX}px`;
     } else {
       role.style.left = `0px`;
     }
   }
 
+  function turnUp() {
+    if (z < floorHeight - moveDistanceZ) {
+      role.style.transform = `translateZ(${-(z + moveDistanceZ * 1.5) * 1.11}px) rotateY(${deg})`;
+    }
+  }
+
+  function turnDown() {
+    if (z > moveDistanceZ) {
+      role.style.transform = `translateZ(${-(z - moveDistanceZ) * 1.11}px) rotateY(${deg})`;
+    }
+  }
+
   if (e.key === 'ArrowRight' || e.key === 'D' || e.key === 'd') {
-    role.style.transform = 'rotateY(180deg)';
+    role.style.transform = `translateZ(${px}) rotateY(180deg)`;
     setTimeout(function () {
       turnRight();
     }, flag ? 500 : 0);
@@ -105,27 +144,38 @@ screen.addEventListener('keydown', function (e) {
   }
 
   if (e.key === 'ArrowLeft' || e.key === 'A' || e.key === 'a') {
-    role.style.transform = 'rotateY(0deg)';
+    role.style.transform = `translateZ(${px}) rotateY(0deg)`;
     setTimeout(function () {
       turnLeft();
     }, !flag ? 500 : 0);
     flag = true;
   }
+
+  if (e.key === 'ArrowUp' || e.key === 'W' || e.key === 'w') {
+    turnUp();
+  }
+
+  if (e.key === 'ArrowDown' || e.key === 'S' || e.key === 's') {
+    turnDown();
+  }
 });
 
 // 移动端滑动
 // 解决第一次transform卡顿问题
-role.style.transform = 'rotateY(0deg)';
+role.style.transform = 'translateZ(0px) rotateY(0deg)';
 
 document.body.addEventListener('touchmove', function (e) {
   const touchDistance = e.touches[0].clientX - role.clientWidth / 2;
+  const translateZValue = role.style.transform;
+  const matchTranslateZValue = translateZValue.match(/translateZ\(([^)]+)\)/);
+  let px = matchTranslateZValue[1];
 
   if (touchDistance > parseFloat(role.style.left)) {
-    role.style.transform = 'rotateY(180deg)';
+    role.style.transform = `translateZ(${px}) rotateY(180deg)`;
     role.style.left = `${touchDistance}px`;
     flag = false;
   } else {
-    role.style.transform = 'rotateY(0deg)';
+    role.style.transform = `translateZ(${px}) rotateY(0deg)`;
     role.style.left = `${touchDistance}px`;
     flag = true;
   }
