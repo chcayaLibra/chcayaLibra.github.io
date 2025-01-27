@@ -22,6 +22,7 @@ body {
   height: 100vh;
   width: 100vw;
   background: url('../images/background.jpg') no-repeat center bottom / cover;
+  perspective: 500px;
 }
 
 .bg-left,
@@ -101,13 +102,12 @@ body {
 
 .role {
   position: absolute;
-  bottom: 5%;
+  bottom: 0;
   /* left: 40%; */
   z-index: 9;
-  /* z-index: 99999; */
   filter: drop-shadow(0 0 3px rgb(0, 0, 0));
   transition: all .5s ease-in-out;
-  transform: rotateY(180deg);
+  transform: rotateY(180deg) translateZ(0px);
 }
 
 .role img {
