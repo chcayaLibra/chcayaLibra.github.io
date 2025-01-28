@@ -41,43 +41,35 @@ shade.addEventListener('click', function (e) {
 // 公共属性
 const screen = document.documentElement;
 const role = document.querySelector('.role');
-
-const rotateYValue = role.style.transform;
-const matchRotateYValue = rotateYValue.match(/rotateY\(([^)]+)\)/);
-
-const translateZValue = role.style.transform;
-const matchTranslateZValue = translateZValue.match(/translateZ\(([^)]+)\)/);
-
 const floorHeight = Math.max(innerHeight * 0.16216 - 1, 85);
-
-let flag = true;
-
-
-// 角色点击移动
 const click = document.querySelector('.click');
+// 判断翻转开关
+let flag = true;
 // 换算角色位置并初始化
 role.style.left = `${parseInt(role.style.left) * 0.01 * screen.clientWidth}px`;
 
+// 角色点击移动 && 点击特效
 screen.addEventListener('click', function (e) {
   const clickDistance = e.clientX - role.clientWidth / 2;
   const z = Math.max(screen.clientHeight - e.clientY, 0);
+  const [defaultAngle, rotateAngle] = ['0deg', '180deg'];
+
+  function setTransform(angle) {
+    if (z < floorHeight) {
+      role.style.transform = `translateZ(${-z * 1.11}px) rotateY(${angle})`;
+    } else {
+      role.style.transform = `translateZ(-150px) rotateY(${angle})`;
+    }
+  }
 
   if (clickDistance > parseFloat(role.style.left)) {
-    if (z < floorHeight) {
-      role.style.transform = `translateZ(${-z * 1.11}px) rotateY(180deg)`;
-    } else {
-      role.style.transform = `translateZ(-150px) rotateY(180deg)`;
-    }
+    setTransform(rotateAngle);
     setTimeout(function () {
       role.style.left = `${clickDistance}px`;
     }, flag ? 500 : 0);
     flag = false;
   } else {
-    if (z < floorHeight) {
-      role.style.transform = `translateZ(${-z * 1.11}px) rotateY(0deg)`;
-    } else {
-      role.style.transform = `translateZ(-150px) rotateY(0deg)`;
-    }
+    setTransform(defaultAngle);
     setTimeout(function () {
       role.style.left = `${clickDistance}px`;
     }, flag ? 0 : 500);
@@ -87,7 +79,6 @@ screen.addEventListener('click', function (e) {
   click.style.left = `${e.clientX - click.clientWidth / 2}px`;
   click.style.top = `${e.clientY - click.clientHeight / 2}px`;
 
-  // 点击特效
   click.classList.add('click-animation');
   setTimeout(function () {
     click.classList.remove('click-animation');
@@ -101,11 +92,12 @@ screen.addEventListener('keydown', function (e) {
   const z = Math.max(innerHeight - roleRect.bottom, 0);
   const moveDistanceX = 100;
   const moveDistanceZ = 30;
-  const translateZValue = role.style.transform;
-  const matchTranslateZValue = translateZValue.match(/translateZ\(([^)]+)\)/);
-  let deg = matchRotateYValue[1];
-  let px = matchTranslateZValue[1];
 
+  const transformValue = role.style.transform;
+  const matchRotateY = transformValue.match(/rotateY\(([^)]+)\)/);
+  const matchTranslateZ = transformValue.match(/translateZ\(([^)]+)\)/);
+  let deg = matchRotateY[1];
+  let px = matchTranslateZ[1];
 
   function turnRight() {
     if (parseInt(role.style.left) < screen.clientWidth - role.clientWidth - moveDistanceX) {
@@ -166,17 +158,24 @@ role.style.transform = 'translateZ(0px) rotateY(0deg)';
 
 document.body.addEventListener('touchmove', function (e) {
   const touchDistance = e.touches[0].clientX - role.clientWidth / 2;
-  const translateZValue = role.style.transform;
-  const matchTranslateZValue = translateZValue.match(/translateZ\(([^)]+)\)/);
-  let px = matchTranslateZValue[1];
+  const z = Math.max(screen.clientHeight - e.touches[0].clientY, 0);
+  const [defaultAngle, rotateAngle] = ['0deg', '180deg'];
+
+  function setTransform(angle) {
+    if (z < floorHeight) {
+      role.style.transform = `translateZ(${-z * 1.11}px) rotateY(${angle})`;
+      role.style.left = `${touchDistance}px`;
+    } else {
+      role.style.transform = `translateZ(-150px) rotateY(${angle})`;
+      role.style.left = `${touchDistance}px`;
+    }
+  }
 
   if (touchDistance > parseFloat(role.style.left)) {
-    role.style.transform = `translateZ(${px}) rotateY(180deg)`;
-    role.style.left = `${touchDistance}px`;
+    setTransform(rotateAngle);
     flag = false;
   } else {
-    role.style.transform = `translateZ(${px}) rotateY(0deg)`;
-    role.style.left = `${touchDistance}px`;
+    setTransform(defaultAngle);
     flag = true;
   }
 
